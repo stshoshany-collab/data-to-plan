@@ -25,6 +25,7 @@ import { useCases } from "@/hooks/useCases";
 import { Case } from "@/types/case";
 import { CaseFormDialog } from "@/components/cases/CaseFormDialog";
 import { toast } from "sonner";
+import { logAudit } from "@/lib/auditLog";
 import {
   Plus,
   Search,
@@ -88,9 +89,11 @@ const Cases = () => {
   const handleSubmit = (c: Case) => {
     if (editing) {
       updateCase(c.id, c);
+      void logAudit("update", "case", c.id, { name: c.name });
       toast.success("נשמר בהצלחה", { description: `המקרה "${c.name}" עודכן.` });
     } else {
       addCase(c);
+      void logAudit("create", "case", c.id, { name: c.name });
       toast.success("נשמר בהצלחה", { description: `המקרה "${c.name}" נוסף.` });
     }
     setFormOpen(false);
@@ -99,13 +102,16 @@ const Cases = () => {
 
   const handleDuplicate = (c: Case) => {
     duplicateCase(c.id);
+    void logAudit("create", "case", null, { duplicatedFrom: c.id, name: c.name });
     toast.success("המקרה שוכפל", { description: `נוצר עותק של "${c.name}".` });
   };
 
   const confirmDelete = () => {
     if (!pendingDelete) return;
     const name = pendingDelete.name;
-    deleteCase(pendingDelete.id);
+    const id = pendingDelete.id;
+    deleteCase(id);
+    void logAudit("delete", "case", id, { name });
     setPendingDelete(null);
     toast.success("המקרה נמחק", { description: `"${name}" הוסר מהרשימה.` });
   };

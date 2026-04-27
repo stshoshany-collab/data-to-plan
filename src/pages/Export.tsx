@@ -16,6 +16,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { EmptyState } from "@/components/EmptyState";
 import { useCases } from "@/hooks/useCases";
 import { useLocalStorageState } from "@/hooks/useLocalStorageState";
+import { useCloudArrayState } from "@/hooks/useCloudArrayState";
 import { Goal } from "@/types/goal";
 import { SessionPlan } from "@/types/session";
 import { InterventionPlan } from "@/types/intervention";
@@ -68,11 +69,11 @@ const KIND_OPTIONS: { value: ExportKind; label: string }[] = [
 
 const Export = () => {
   const { cases } = useCases();
-  const [goals] = useLocalStorageState<Goal[]>(STORAGE.goals, []);
-  const [sessions] = useLocalStorageState<SessionPlan[]>(STORAGE.sessions, []);
-  const [interventions] = useLocalStorageState<InterventionPlan[]>(STORAGE.interventions, []);
+  const [goals] = useCloudArrayState<Goal>("goals", STORAGE.goals, []);
+  const [sessions] = useCloudArrayState<SessionPlan>("session_plans", STORAGE.sessions, []);
+  const [interventions] = useCloudArrayState<InterventionPlan>("intervention_plans", STORAGE.interventions, []);
   const [activities] = useLocalStorageState<Activity[]>(STORAGE.activities, demoActivities);
-  const [reports] = useLocalStorageState<Report[]>(STORAGE.reports, []);
+  const [reports] = useCloudArrayState<Report>("reports", STORAGE.reports, []);
 
   const [kind, setKind] = useState<ExportKind>("case");
   const [selectedId, setSelectedId] = useState<string>("");

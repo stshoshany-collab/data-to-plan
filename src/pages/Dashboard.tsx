@@ -6,7 +6,7 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { NavLink } from "@/components/NavLink";
 import { navItems } from "@/config/navigation";
 import { useCases } from "@/hooks/useCases";
-import { useLocalStorageState } from "@/hooks/useLocalStorageState";
+import { useCloudArrayState } from "@/hooks/useCloudArrayState";
 import { Goal } from "@/types/goal";
 import { SessionPlan } from "@/types/session";
 import { InterventionPlan } from "@/types/intervention";
@@ -29,10 +29,10 @@ const formatDate = (iso: string) =>
 
 const Dashboard = () => {
   const { cases } = useCases();
-  const [goals] = useLocalStorageState<Goal[]>("ba-app:goals:v1", []);
-  const [sessions] = useLocalStorageState<SessionPlan[]>("ba-app:sessions:v1", []);
-  const [interventions] = useLocalStorageState<InterventionPlan[]>("ba-app:interventions:v1", []);
-  const [reports] = useLocalStorageState<Report[]>("ba-app:reports:v1", []);
+  const [goals] = useCloudArrayState<Goal>("goals", "ba-app:goals:v1", []);
+  const [sessions] = useCloudArrayState<SessionPlan>("session_plans", "ba-app:sessions:v1", []);
+  const [interventions] = useCloudArrayState<InterventionPlan>("intervention_plans", "ba-app:interventions:v1", []);
+  const [reports] = useCloudArrayState<Report>("reports", "ba-app:reports:v1", []);
 
   const stats = [
     { label: "מקרים פעילים", value: cases.length, icon: FolderOpen, color: "text-primary" },

@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { useCases } from "@/hooks/useCases";
-import { useLocalStorageState } from "@/hooks/useLocalStorageState";
+import { useCloudArrayState } from "@/hooks/useCloudArrayState";
 import {
   ABCAnalysis,
   buildAnalysisSummary,
@@ -44,7 +44,7 @@ const formatDate = (iso: string) =>
 
 const Analysis = () => {
   const { cases } = useCases();
-  const [analyses, setAnalyses] = useLocalStorageState<ABCAnalysis[]>(STORAGE_KEY, []);
+  const [analyses, setAnalyses] = useCloudArrayState<ABCAnalysis>("abc_observations", STORAGE_KEY, []);
   const [form, setForm] = useState<ABCAnalysis>(() => createEmptyAnalysis());
 
   // Default to the first case if none chosen yet

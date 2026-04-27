@@ -15,7 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useCases } from "@/hooks/useCases";
-import { useLocalStorageState } from "@/hooks/useLocalStorageState";
+import { useCloudArrayState } from "@/hooks/useCloudArrayState";
 import {
   SessionPlan,
   applySessionTemplate,
@@ -48,7 +48,7 @@ const formatDate = (iso: string) =>
 
 const Sessions = () => {
   const { cases } = useCases();
-  const [sessions, setSessions] = useLocalStorageState<SessionPlan[]>(STORAGE_KEY, []);
+  const [sessions, setSessions] = useCloudArrayState<SessionPlan>("session_plans", STORAGE_KEY, []);
   const [form, setForm] = useState<SessionPlan>(() => createEmptySession());
 
   useEffect(() => {

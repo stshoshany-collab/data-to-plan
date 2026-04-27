@@ -1,15 +1,30 @@
 import { ReactNode } from "react";
-import { Bell, Search, UserCircle2 } from "lucide-react";
+import { Bell, LogOut, Search, UserCircle2 } from "lucide-react";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { AppSidebar } from "./AppSidebar";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 interface AppLayoutProps {
   children: ReactNode;
 }
 
 export function AppLayout({ children }: AppLayoutProps) {
+  const { user, signOut } = useAuth();
+  const handleSignOut = async () => {
+    await signOut();
+    toast.success("התנתקת בהצלחה");
+  };
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-background">
@@ -41,9 +56,24 @@ export function AppLayout({ children }: AppLayoutProps) {
                 <Button variant="ghost" size="icon" aria-label="התראות">
                   <Bell className="h-5 w-5" />
                 </Button>
-                <Button variant="ghost" size="icon" aria-label="פרופיל">
-                  <UserCircle2 className="h-5 w-5" />
-                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" aria-label="פרופיל">
+                      <UserCircle2 className="h-5 w-5" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <DropdownMenuLabel className="text-right">
+                      <div className="text-sm font-medium truncate">{user?.email}</div>
+                      <div className="text-xs text-muted-foreground">מחוברת</div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleSignOut} className="text-destructive focus:text-destructive">
+                      <LogOut className="ms-2 h-4 w-4" />
+                      התנתקות
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </div>
           </header>

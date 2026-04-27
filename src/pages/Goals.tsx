@@ -29,7 +29,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useCases } from "@/hooks/useCases";
-import { useLocalStorageState } from "@/hooks/useLocalStorageState";
+import { useCloudArrayState } from "@/hooks/useCloudArrayState";
 import { Goal } from "@/types/goal";
 import { GoalFormDialog } from "@/components/goals/GoalFormDialog";
 import { toast } from "sonner";
@@ -56,7 +56,7 @@ const formatDate = (iso: string) =>
 
 const Goals = () => {
   const { cases } = useCases();
-  const [goals, setGoals] = useLocalStorageState<Goal[]>(STORAGE_KEY, []);
+  const [goals, setGoals] = useCloudArrayState<Goal>("goals", STORAGE_KEY, []);
   const [search, setSearch] = useState("");
   const [filterCase, setFilterCase] = useState<string>("all");
   const [formOpen, setFormOpen] = useState(false);

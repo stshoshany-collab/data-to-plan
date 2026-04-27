@@ -15,7 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useCases } from "@/hooks/useCases";
-import { useLocalStorageState } from "@/hooks/useLocalStorageState";
+import { useCloudArrayState } from "@/hooks/useCloudArrayState";
 import {
   InterventionPlan,
   buildFullPlan,
@@ -49,7 +49,7 @@ const formatDate = (iso: string) =>
 
 const Interventions = () => {
   const { cases } = useCases();
-  const [plans, setPlans] = useLocalStorageState<InterventionPlan[]>(STORAGE_KEY, []);
+  const [plans, setPlans] = useCloudArrayState<InterventionPlan>("intervention_plans", STORAGE_KEY, []);
   const [form, setForm] = useState<InterventionPlan>(() => createEmptyIntervention());
 
   useEffect(() => {

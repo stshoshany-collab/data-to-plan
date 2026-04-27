@@ -31,6 +31,8 @@ export const FUNCTIONING_LEVELS: FunctioningLevel[] = [
 export interface Case {
   id: string;
   name: string;
+  caseCode?: string;
+  useCodeOnly?: boolean;
   age: number | null;
   educationalSetting: string;
   diagnoses: string;
@@ -49,6 +51,8 @@ export interface Case {
 export const createEmptyCase = (): Case => ({
   id: crypto.randomUUID(),
   name: "",
+  caseCode: "",
+  useCodeOnly: false,
   age: null,
   educationalSetting: "",
   diagnoses: "",

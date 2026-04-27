@@ -25,7 +25,7 @@ import {
 import { RecordsSidebar } from "@/components/RecordsSidebar";
 import { FormSection } from "@/components/forms/FormSection";
 import { useCases } from "@/hooks/useCases";
-import { useLocalStorageState } from "@/hooks/useLocalStorageState";
+import { useCloudArrayState } from "@/hooks/useCloudArrayState";
 import {
   buildReport,
   createEmptyReport,
@@ -47,7 +47,7 @@ const STORAGE_KEY = "ba-app:reports:v1";
 
 const Reports = () => {
   const { cases } = useCases();
-  const [reports, setReports] = useLocalStorageState<Report[]>(STORAGE_KEY, []);
+  const [reports, setReports] = useCloudArrayState<Report>("reports", STORAGE_KEY, []);
   const [draft, setDraft] = useState<Report>(() => createEmptyReport());
   const [activeId, setActiveId] = useState<string | null>(null);
   const [pendingDelete, setPendingDelete] = useState<string | null>(null);

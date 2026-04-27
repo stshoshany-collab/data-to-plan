@@ -50,6 +50,26 @@ const Auth = () => {
       return;
     }
     toast.success("התחברת בהצלחה");
+    logAudit("signin", "auth", null, { email });
+  };
+
+  const handleForgotPassword = async () => {
+    try {
+      emailSchema.parse(email);
+    } catch {
+      toast.error("יש להזין כתובת אימייל תקינה לפני שחזור סיסמה");
+      return;
+    }
+    setBusy(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/auth`,
+    });
+    setBusy(false);
+    if (error) {
+      toast.error("לא ניתן לשלוח מייל לשחזור סיסמה כרגע");
+      return;
+    }
+    toast.success("נשלח מייל לאיפוס סיסמה. בדקי את תיבת הדואר");
   };
 
   const handleSignUp = async (e: React.FormEvent) => {

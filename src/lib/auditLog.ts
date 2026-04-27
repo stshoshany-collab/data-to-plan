@@ -32,13 +32,15 @@ export async function logAudit(
     const { data: userRes } = await supabase.auth.getUser();
     const ownerId = userRes.user?.id;
     if (!ownerId) return;
-    await supabase.from("audit_logs").insert({
-      owner_id: ownerId,
-      action,
-      entity,
-      entity_id: entityId ?? null,
-      meta,
-    });
+    await supabase.from("audit_logs").insert([
+      {
+        owner_id: ownerId,
+        action,
+        entity,
+        entity_id: entityId ?? null,
+        meta: meta as never,
+      },
+    ]);
   } catch (err) {
     // eslint-disable-next-line no-console
     console.warn("audit log failed", err);

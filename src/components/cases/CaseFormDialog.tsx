@@ -25,6 +25,7 @@ import {
   createEmptyCase,
 } from "@/types/case";
 import { Save } from "lucide-react";
+import { PrivacyNotice } from "@/components/PrivacyNotice";
 
 interface CaseFormDialogProps {
   open: boolean;
@@ -71,6 +72,7 @@ export function CaseFormDialog({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-5">
+          {!isEdit && <PrivacyNotice />}
           {/* Identification */}
           <section className="grid gap-4 sm:grid-cols-3">
             <div className="space-y-2 sm:col-span-1">

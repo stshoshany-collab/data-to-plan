@@ -34,6 +34,7 @@ import {
   ReportType,
 } from "@/types/report";
 import { toast } from "sonner";
+import { logAudit } from "@/lib/auditLog";
 import {
   BarChart3,
   Copy,
@@ -77,12 +78,18 @@ const Reports = () => {
       generatedText: draft.generatedText || buildReport(draft, caseName),
       updatedAt: new Date().toISOString(),
     };
+    let isNew = false;
     setReports((prev) => {
       const exists = prev.some((r) => r.id === final.id);
+      isNew = !exists;
       return exists ? prev.map((r) => (r.id === final.id ? final : r)) : [final, ...prev];
     });
     setDraft(final);
     setActiveId(final.id);
+    void logAudit(isNew ? "create" : "update", "report", final.id, {
+      type: final.type,
+      caseId: final.caseId,
+    });
     toast.success("נשמר בהצלחה");
   };
 
@@ -95,9 +102,11 @@ const Reports = () => {
 
   const confirmDelete = () => {
     if (!pendingDelete) return;
-    setReports((prev) => prev.filter((r) => r.id !== pendingDelete));
-    if (activeId === pendingDelete) newDraft();
+    const id = pendingDelete;
+    setReports((prev) => prev.filter((r) => r.id !== id));
+    if (activeId === id) newDraft();
     setPendingDelete(null);
+    void logAudit("delete", "report", id);
     toast.success("הדוח נמחק");
   };
 

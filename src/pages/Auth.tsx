@@ -151,6 +151,15 @@ const Auth = () => {
                     {busy && <Loader2 className="h-4 w-4 animate-spin" />}
                     התחברות
                   </Button>
+                  <Button
+                    type="button"
+                    variant="link"
+                    className="w-full text-xs text-muted-foreground"
+                    onClick={handleForgotPassword}
+                    disabled={busy}
+                  >
+                    שכחת סיסמה?
+                  </Button>
                 </form>
               </TabsContent>
 

@@ -22,7 +22,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useCases } from "@/hooks/useCases";
-import { Case } from "@/types/case";
+import { Case, demoCases } from "@/types/case";
 import { CaseFormDialog } from "@/components/cases/CaseFormDialog";
 import { toast } from "sonner";
 import { logAudit } from "@/lib/auditLog";

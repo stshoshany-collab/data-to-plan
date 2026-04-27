@@ -66,10 +66,19 @@ export function AppLayout({ children }: AppLayoutProps) {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-56">
                     <DropdownMenuLabel className="text-right">
-                      <div className="text-sm font-medium truncate">{user?.email}</div>
-                      <div className="text-xs text-muted-foreground">מחוברת</div>
+                      <div className="text-sm font-medium truncate">
+                        {user?.email || "אורח/ת"}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {user?.email ? "מחוברת" : "מצב גישה מהירה"}
+                      </div>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
+                    {!user?.email && (
+                      <DropdownMenuItem asChild>
+                        <a href="/auth">יצירת חשבון או התחברות</a>
+                      </DropdownMenuItem>
+                    )}
                     <DropdownMenuItem onClick={handleSignOut} className="text-destructive focus:text-destructive">
                       <LogOut className="ms-2 h-4 w-4" />
                       התנתקות

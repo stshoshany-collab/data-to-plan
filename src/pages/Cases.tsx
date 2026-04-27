@@ -169,8 +169,12 @@ const Cases = () => {
                   variant="outline"
                   onClick={async () => {
                     for (const c of demoCases) {
-                      const { id, createdAt, updatedAt, ...rest } = c;
-                      await addCase(rest as Omit<Case, "id" | "createdAt" | "updatedAt">);
+                      addCase({
+                        ...c,
+                        id: crypto.randomUUID(),
+                        createdAt: new Date().toISOString(),
+                        updatedAt: new Date().toISOString(),
+                      });
                     }
                     toast.success("נטענו נתוני דוגמה");
                   }}

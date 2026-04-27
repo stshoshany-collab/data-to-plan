@@ -160,10 +160,24 @@ const Cases = () => {
                 : "נסי לחפש במונחים אחרים או נקי את שדה החיפוש."}
             </p>
             {cases.length === 0 && (
-              <Button onClick={handleNew}>
-                <Plus className="ms-2 h-4 w-4" />
-                הוספת מקרה ראשון
-              </Button>
+              <div className="flex flex-wrap gap-2 justify-center">
+                <Button onClick={handleNew}>
+                  <Plus className="ms-2 h-4 w-4" />
+                  הוספת מקרה ראשון
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={async () => {
+                    for (const c of demoCases) {
+                      const { id, createdAt, updatedAt, ...rest } = c;
+                      await addCase(rest as Omit<Case, "id" | "createdAt" | "updatedAt">);
+                    }
+                    toast.success("נטענו נתוני דוגמה");
+                  }}
+                >
+                  טען נתוני דוגמה
+                </Button>
+              </div>
             )}
           </CardContent>
         </Card>

@@ -39,6 +39,30 @@ import {
   toPlainText,
 } from "@/lib/exportDoc";
 import { toast } from "sonner";
+import { logAudit } from "@/lib/auditLog";
+import { supabase } from "@/integrations/supabase/client";
+
+const recordExport = (
+  kind: ExportKind,
+  format: "copy" | "print" | "pdf" | "word" | "html",
+  doc: ExportDocument | null,
+  entityId?: string | null,
+) => {
+  void logAudit("export", "export", entityId ?? null, { kind, format, title: doc?.title });
+  void supabase.auth.getUser().then(({ data }) => {
+    if (!data.user) return;
+    void supabase.from("exports").insert([
+      {
+        owner_id: data.user.id,
+        entity: kind,
+        entity_id: entityId ?? null,
+        format,
+        title: doc?.title ?? null,
+        meta: {} as never,
+      },
+    ]);
+  });
+};
 import {
   Copy,
   Download,
@@ -182,6 +206,7 @@ const Export = () => {
     if (!doc) return;
     try {
       await navigator.clipboard.writeText(toPlainText(doc));
+      recordExport(kind, "copy", doc, selectedId);
       toast.success("המסמך הועתק ללוח");
     } catch {
       toast.error("העתקה נכשלה. נסי שוב.");
@@ -192,6 +217,7 @@ const Export = () => {
     if (!doc) return;
     try {
       printDoc(doc);
+      recordExport(kind, "print", doc, selectedId);
       toast.success("נפתח חלון הדפסה");
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "ההדפסה נכשלה");
@@ -201,8 +227,8 @@ const Export = () => {
   const handlePdf = () => {
     if (!doc) return;
     try {
-      // Same flow as Print – user picks "Save as PDF" in the system dialog.
       printDoc(doc);
+      recordExport(kind, "pdf", doc, selectedId);
       toast.info('בחלון שנפתח – בחרי "שמירה כ-PDF" כיעד ההדפסה');
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "ייצוא PDF נכשל");
@@ -212,12 +238,14 @@ const Export = () => {
   const handleWord = () => {
     if (!doc) return;
     downloadWord(doc);
+    recordExport(kind, "word", doc, selectedId);
     toast.success("הקובץ הורד (Word/HTML)");
   };
 
   const handleHtml = () => {
     if (!doc) return;
     downloadHtml(doc);
+    recordExport(kind, "html", doc, selectedId);
     toast.success("קובץ HTML הורד");
   };
 

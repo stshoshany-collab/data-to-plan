@@ -106,6 +106,81 @@ export type Database = {
         }
         Relationships: []
       }
+      exports: {
+        Row: {
+          case_id: string | null
+          created_at: string
+          entity: string
+          entity_id: string | null
+          format: string
+          id: string
+          meta: Json
+          owner_id: string
+          title: string | null
+        }
+        Insert: {
+          case_id?: string | null
+          created_at?: string
+          entity: string
+          entity_id?: string | null
+          format: string
+          id?: string
+          meta?: Json
+          owner_id: string
+          title?: string | null
+        }
+        Update: {
+          case_id?: string | null
+          created_at?: string
+          entity?: string
+          entity_id?: string | null
+          format?: string
+          id?: string
+          meta?: Json
+          owner_id?: string
+          title?: string | null
+        }
+        Relationships: []
+      }
+      files: {
+        Row: {
+          case_id: string | null
+          created_at: string
+          id: string
+          meta: Json
+          mime_type: string | null
+          name: string
+          owner_id: string
+          size_bytes: number | null
+          storage_path: string
+          updated_at: string
+        }
+        Insert: {
+          case_id?: string | null
+          created_at?: string
+          id?: string
+          meta?: Json
+          mime_type?: string | null
+          name: string
+          owner_id: string
+          size_bytes?: number | null
+          storage_path: string
+          updated_at?: string
+        }
+        Update: {
+          case_id?: string | null
+          created_at?: string
+          id?: string
+          meta?: Json
+          mime_type?: string | null
+          name?: string
+          owner_id?: string
+          size_bytes?: number | null
+          storage_path?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       goals: {
         Row: {
           case_id: string | null

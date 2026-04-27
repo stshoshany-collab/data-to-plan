@@ -62,7 +62,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                       <UserCircle2 className="h-5 w-5" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56" dir="rtl">
+                  <DropdownMenuContent align="end" className="w-56">
                     <DropdownMenuLabel className="text-right">
                       <div className="text-sm font-medium truncate">{user?.email}</div>
                       <div className="text-xs text-muted-foreground">מחוברת</div>

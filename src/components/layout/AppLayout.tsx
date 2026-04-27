@@ -16,7 +16,7 @@ export function AppLayout({ children }: AppLayoutProps) {
         <AppSidebar />
 
         <div className="flex-1 flex flex-col min-w-0">
-          <header className="h-16 border-b border-border bg-card/80 backdrop-blur-sm sticky top-0 z-30">
+          <header className="app-header h-16 border-b border-border bg-card/80 backdrop-blur-sm sticky top-0 z-30" data-no-print>
             <div className="h-full flex items-center justify-between gap-4 px-4 md:px-6">
               <div className="flex items-center gap-3 min-w-0">
                 <SidebarTrigger className="shrink-0" />

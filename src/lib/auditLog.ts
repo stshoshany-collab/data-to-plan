@@ -6,7 +6,9 @@ export type AuditAction =
   | "delete"
   | "export"
   | "upload"
-  | "process";
+  | "process"
+  | "signin"
+  | "signout";
 
 export type AuditEntity =
   | "case"
@@ -16,7 +18,8 @@ export type AuditEntity =
   | "intervention_plan"
   | "report"
   | "file"
-  | "export";
+  | "export"
+  | "auth";
 
 /**
  * Lightweight audit log writer. Failures are swallowed (logged only) so

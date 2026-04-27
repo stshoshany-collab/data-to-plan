@@ -14,6 +14,7 @@ import {
 import { AppSidebar } from "./AppSidebar";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { logAudit } from "@/lib/auditLog";
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -22,6 +23,7 @@ interface AppLayoutProps {
 export function AppLayout({ children }: AppLayoutProps) {
   const { user, signOut } = useAuth();
   const handleSignOut = async () => {
+    await logAudit("signout", "auth", null, { email: user?.email });
     await signOut();
     toast.success("התנתקת בהצלחה");
   };

@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Brain, Loader2 } from "lucide-react";
+import { logAudit } from "@/lib/auditLog";
 
 const emailSchema = z.string().trim().email("אימייל לא תקין").max(255);
 const passwordSchema = z.string().min(8, "סיסמה חייבת לפחות 8 תווים").max(72);
@@ -49,6 +50,26 @@ const Auth = () => {
       return;
     }
     toast.success("התחברת בהצלחה");
+    logAudit("signin", "auth", null, { email });
+  };
+
+  const handleForgotPassword = async () => {
+    try {
+      emailSchema.parse(email);
+    } catch {
+      toast.error("יש להזין כתובת אימייל תקינה לפני שחזור סיסמה");
+      return;
+    }
+    setBusy(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/auth`,
+    });
+    setBusy(false);
+    if (error) {
+      toast.error("לא ניתן לשלוח מייל לשחזור סיסמה כרגע");
+      return;
+    }
+    toast.success("נשלח מייל לאיפוס סיסמה. בדקי את תיבת הדואר");
   };
 
   const handleSignUp = async (e: React.FormEvent) => {
@@ -129,6 +150,15 @@ const Auth = () => {
                   <Button type="submit" className="w-full" disabled={busy}>
                     {busy && <Loader2 className="h-4 w-4 animate-spin" />}
                     התחברות
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="link"
+                    className="w-full text-xs text-muted-foreground"
+                    onClick={handleForgotPassword}
+                    disabled={busy}
+                  >
+                    שכחת סיסמה?
                   </Button>
                 </form>
               </TabsContent>

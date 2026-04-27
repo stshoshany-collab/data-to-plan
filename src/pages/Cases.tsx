@@ -22,7 +22,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useCases } from "@/hooks/useCases";
-import { Case } from "@/types/case";
+import { Case, demoCases } from "@/types/case";
 import { CaseFormDialog } from "@/components/cases/CaseFormDialog";
 import { toast } from "sonner";
 import { logAudit } from "@/lib/auditLog";
@@ -160,10 +160,28 @@ const Cases = () => {
                 : "נסי לחפש במונחים אחרים או נקי את שדה החיפוש."}
             </p>
             {cases.length === 0 && (
-              <Button onClick={handleNew}>
-                <Plus className="ms-2 h-4 w-4" />
-                הוספת מקרה ראשון
-              </Button>
+              <div className="flex flex-wrap gap-2 justify-center">
+                <Button onClick={handleNew}>
+                  <Plus className="ms-2 h-4 w-4" />
+                  הוספת מקרה ראשון
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={async () => {
+                    for (const c of demoCases) {
+                      addCase({
+                        ...c,
+                        id: crypto.randomUUID(),
+                        createdAt: new Date().toISOString(),
+                        updatedAt: new Date().toISOString(),
+                      });
+                    }
+                    toast.success("נטענו נתוני דוגמה");
+                  }}
+                >
+                  טען נתוני דוגמה
+                </Button>
+              </div>
             )}
           </CardContent>
         </Card>

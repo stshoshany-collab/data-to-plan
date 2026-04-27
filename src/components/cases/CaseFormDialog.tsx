@@ -86,6 +86,15 @@ export function CaseFormDialog({
               />
             </div>
             <div className="space-y-2">
+              <Label htmlFor="caseCode">קוד מקרה (מומלץ במקום שם מלא)</Label>
+              <Input
+                id="caseCode"
+                value={form.caseCode ?? ""}
+                onChange={(e) => update("caseCode", e.target.value)}
+                placeholder="לדוגמה: C-2024-001"
+              />
+            </div>
+            <div className="space-y-2">
               <Label htmlFor="age">גיל</Label>
               <Input
                 id="age"
@@ -99,7 +108,7 @@ export function CaseFormDialog({
                 placeholder="לדוגמה: 6"
               />
             </div>
-            <div className="space-y-2">
+            <div className="space-y-2 sm:col-span-2">
               <Label htmlFor="setting">מסגרת חינוכית</Label>
               <Input
                 id="setting"
@@ -107,6 +116,17 @@ export function CaseFormDialog({
                 onChange={(e) => update("educationalSetting", e.target.value)}
                 placeholder="לדוגמה: כיתה א׳"
               />
+            </div>
+            <div className="flex items-end gap-2 sm:col-span-1">
+              <label className="flex items-center gap-2 text-sm cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={form.useCodeOnly ?? false}
+                  onChange={(e) => update("useCodeOnly", e.target.checked)}
+                  className="h-4 w-4 accent-primary"
+                />
+                <span>הצג רק קוד מקרה (ללא שם)</span>
+              </label>
             </div>
           </section>
 

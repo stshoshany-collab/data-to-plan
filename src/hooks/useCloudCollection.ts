@@ -55,7 +55,7 @@ export function useCloudCollection<T extends BaseEntity>(
       return;
     }
     setLoading(true);
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from(table)
       .select("*")
       .order("created_at", { ascending: false });
@@ -92,7 +92,7 @@ export function useCloudCollection<T extends BaseEntity>(
           data: rest,
         };
       });
-      const { error } = await supabase.from(table).insert(rows);
+      const { error } = await (supabase as any).from(table).insert(rows);
       if (error) console.warn(`migration of ${table} failed`, error);
       localStorage.setItem(flagKey, "1");
     } catch (e) {
@@ -110,7 +110,7 @@ export function useCloudCollection<T extends BaseEntity>(
   const add = useCallback(async (item: T) => {
     if (!user) return null;
     const { id, createdAt, updatedAt, caseId, ...rest } = item as any;
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from(table)
       .insert({
         owner_id: user.id,
@@ -138,7 +138,7 @@ export function useCloudCollection<T extends BaseEntity>(
     const current = items.find((i) => i.id === id);
     const merged = { ...current, ...updates } as any;
     const { id: _id, createdAt: _c, updatedAt: _u, caseId, ...rest } = merged;
-    const { error } = await supabase
+    const { error } = await (supabase as any)
       .from(table)
       .update({ data: rest, case_id: caseId || null })
       .eq("id", id);
@@ -153,7 +153,7 @@ export function useCloudCollection<T extends BaseEntity>(
   const remove = useCallback(async (id: string) => {
     if (!user) return;
     setItems((prev) => prev.filter((it) => it.id !== id));
-    const { error } = await supabase.from(table).delete().eq("id", id);
+    const { error } = await (supabase as any).from(table).delete().eq("id", id);
     if (error) console.error(`delete ${table} failed`, error);
     else {
       await supabase.from("audit_logs").insert({

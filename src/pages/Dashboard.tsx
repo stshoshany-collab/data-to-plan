@@ -1,56 +1,78 @@
+import { useMemo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { NavLink } from "@/components/NavLink";
 import { navItems } from "@/config/navigation";
+import { useCases } from "@/hooks/useCases";
+import { useLocalStorageState } from "@/hooks/useLocalStorageState";
+import { Goal } from "@/types/goal";
+import { SessionPlan } from "@/types/session";
+import { InterventionPlan } from "@/types/intervention";
+import { Report } from "@/types/report";
 import {
   FolderOpen,
   Target,
   CalendarDays,
-  TrendingUp,
+  ClipboardList,
   Plus,
   ArrowLeft,
-  CheckCircle2,
-  Clock,
 } from "lucide-react";
 
-const stats = [
-  { label: "מקרים פעילים", value: "12", icon: FolderOpen, trend: "+2 השבוע", color: "text-primary" },
-  { label: "מטרות פתוחות", value: "34", icon: Target, trend: "8 הושלמו החודש", color: "text-accent" },
-  { label: "מפגשים השבוע", value: "18", icon: CalendarDays, trend: "5 מתוכננים להיום", color: "text-warning" },
-  { label: "התקדמות ממוצעת", value: "72%", icon: TrendingUp, trend: "+5% מהחודש שעבר", color: "text-success" },
-];
-
-const recentCases = [
-  { name: "ילד א׳ – גן חובה", status: "פעיל", lastUpdate: "לפני יומיים", progress: "איסוף מידע" },
-  { name: "ילדה ב׳ – כיתה א׳", status: "פעיל", lastUpdate: "אתמול", progress: "תוכנית התערבות" },
-  { name: "ילד ג׳ – גן טרום חובה", status: "במעקב", lastUpdate: "לפני שבוע", progress: "ניתוח מקרה" },
-];
-
-const upcomingTasks = [
-  { title: "סיכום מפגש – ילד א׳", due: "היום, 16:00", type: "מפגש" },
-  { title: "כתיבת דוח התקדמות חודשי", due: "מחר", type: "דוח" },
-  { title: "פגישת הורים – ילדה ב׳", due: "יום ה׳, 10:00", type: "פגישה" },
-];
+const formatDate = (iso: string) =>
+  new Date(iso).toLocaleDateString("he-IL", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
 
 const Dashboard = () => {
+  const { cases } = useCases();
+  const [goals] = useLocalStorageState<Goal[]>("ba-app:goals:v1", []);
+  const [sessions] = useLocalStorageState<SessionPlan[]>("ba-app:sessions:v1", []);
+  const [interventions] = useLocalStorageState<InterventionPlan[]>("ba-app:interventions:v1", []);
+  const [reports] = useLocalStorageState<Report[]>("ba-app:reports:v1", []);
+
+  const stats = [
+    { label: "מקרים פעילים", value: cases.length, icon: FolderOpen, color: "text-primary" },
+    { label: "מטרות פתוחות", value: goals.length, icon: Target, color: "text-accent" },
+    { label: "מערכי מפגש", value: sessions.length, icon: CalendarDays, color: "text-warning" },
+    { label: "תוכניות + דוחות", value: interventions.length + reports.length, icon: ClipboardList, color: "text-success" },
+  ];
+
+  const recentCases = useMemo(
+    () =>
+      [...cases]
+        .sort((a, b) => (b.updatedAt ?? "").localeCompare(a.updatedAt ?? ""))
+        .slice(0, 5),
+    [cases],
+  );
+
+  const recentReports = useMemo(
+    () =>
+      [...reports]
+        .sort((a, b) => (b.updatedAt ?? "").localeCompare(a.updatedAt ?? ""))
+        .slice(0, 4),
+    [reports],
+  );
+
   return (
     <>
       <PageHeader
         title="שלום, ברוכה הבאה"
-        description="סקירה מהירה של המקרים, המטרות והמשימות שלך."
+        description="סקירה מהירה של המקרים, המטרות והדוחות שלך."
         actions={
           <>
             <Button variant="outline" asChild>
               <NavLink to="/cases">
-                <FolderOpen className="ms-2 h-4 w-4" />
+                <FolderOpen className="h-4 w-4" />
                 כל המקרים
               </NavLink>
             </Button>
             <Button asChild>
               <NavLink to="/cases">
-                <Plus className="ms-2 h-4 w-4" />
+                <Plus className="h-4 w-4" />
                 מקרה חדש
               </NavLink>
             </Button>
@@ -58,7 +80,6 @@ const Dashboard = () => {
         }
       />
 
-      {/* Stats */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
         {stats.map((stat) => (
           <Card key={stat.label} className="shadow-card hover:shadow-elegant transition-shadow">
@@ -67,7 +88,6 @@ const Dashboard = () => {
                 <div className="space-y-1">
                   <p className="text-sm text-muted-foreground">{stat.label}</p>
                   <p className="text-3xl font-bold tracking-tight">{stat.value}</p>
-                  <p className="text-xs text-muted-foreground">{stat.trend}</p>
                 </div>
                 <div className={`p-2.5 rounded-lg bg-primary/5 ${stat.color}`}>
                   <stat.icon className="h-5 w-5" />
@@ -79,62 +99,72 @@ const Dashboard = () => {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3 mb-8">
-        {/* Recent cases */}
         <Card className="lg:col-span-2 shadow-card">
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
               <CardTitle>מקרים אחרונים</CardTitle>
-              <CardDescription>המקרים הפעילים שעודכנו לאחרונה</CardDescription>
+              <CardDescription>המקרים שעודכנו לאחרונה במערכת</CardDescription>
             </div>
             <Button variant="ghost" size="sm" asChild>
               <NavLink to="/cases">
                 הצג הכל
-                <ArrowLeft className="me-1 h-4 w-4" />
+                <ArrowLeft className="h-4 w-4" />
               </NavLink>
             </Button>
           </CardHeader>
           <CardContent className="space-y-3">
-            {recentCases.map((c) => (
-              <div
-                key={c.name}
-                className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-muted/40 transition-colors"
-              >
-                <div className="space-y-0.5">
-                  <p className="font-medium text-sm">{c.name}</p>
-                  <p className="text-xs text-muted-foreground">{c.progress}</p>
+            {recentCases.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-6">
+                עדיין לא הוקמו מקרים. ניתן להתחיל ממסך "מקרים".
+              </p>
+            ) : (
+              recentCases.map((c) => (
+                <div
+                  key={c.id}
+                  className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-muted/40 transition-colors"
+                >
+                  <div className="space-y-0.5 min-w-0">
+                    <p className="font-medium text-sm truncate">{c.name || "ללא שם"}</p>
+                    <p className="text-xs text-muted-foreground truncate">
+                      {c.educationalSetting || "ללא מסגרת"}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3 shrink-0">
+                    <Badge variant="secondary">{c.functioningLevel || "—"}</Badge>
+                    <span className="text-xs text-muted-foreground hidden sm:inline">
+                      {formatDate(c.updatedAt)}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <Badge variant={c.status === "פעיל" ? "default" : "secondary"}>{c.status}</Badge>
-                  <span className="text-xs text-muted-foreground hidden sm:inline">
-                    {c.lastUpdate}
-                  </span>
-                </div>
-              </div>
-            ))}
+              ))
+            )}
           </CardContent>
         </Card>
 
-        {/* Upcoming */}
         <Card className="shadow-card">
           <CardHeader>
-            <CardTitle>משימות קרובות</CardTitle>
-            <CardDescription>למעקב ולביצוע</CardDescription>
+            <CardTitle>דוחות אחרונים</CardTitle>
+            <CardDescription>פעילות עדכנית בייצור דוחות</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
-            {upcomingTasks.map((t) => (
-              <div key={t.title} className="flex items-start gap-3 p-3 rounded-lg bg-muted/40">
-                <Clock className="h-4 w-4 mt-0.5 text-primary shrink-0" />
-                <div className="space-y-0.5 min-w-0">
-                  <p className="text-sm font-medium truncate">{t.title}</p>
-                  <p className="text-xs text-muted-foreground">{t.due}</p>
+            {recentReports.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-6">
+                אין דוחות שמורים עדיין.
+              </p>
+            ) : (
+              recentReports.map((r) => (
+                <div key={r.id} className="p-3 rounded-lg bg-muted/40">
+                  <p className="text-sm font-medium truncate">{r.type}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {cases.find((c) => c.id === r.caseId)?.name || "ללא מקרה"} · {formatDate(r.date)}
+                  </p>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </CardContent>
         </Card>
       </div>
 
-      {/* Quick actions */}
       <div>
         <h2 className="text-lg font-semibold mb-4">פעולות מהירות</h2>
         <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">

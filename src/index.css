@@ -122,3 +122,10 @@
   .shadow-card { box-shadow: var(--shadow-card); }
   .shadow-elegant { box-shadow: var(--shadow-elegant); }
 }
+
+/* Print styles – hide app chrome when printing the in-app preview */
+@media print {
+  aside, nav, header.app-header, [data-no-print] { display: none !important; }
+  body { background: #fff !important; }
+  main { padding: 0 !important; }
+}

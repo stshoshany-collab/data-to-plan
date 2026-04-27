@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Brain, Loader2 } from "lucide-react";
+import { logAudit } from "@/lib/auditLog";
 
 const emailSchema = z.string().trim().email("אימייל לא תקין").max(255);
 const passwordSchema = z.string().min(8, "סיסמה חייבת לפחות 8 תווים").max(72);

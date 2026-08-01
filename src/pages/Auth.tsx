@@ -29,10 +29,9 @@ const Auth = () => {
   const from = (location.state as { from?: string } | null)?.from || "/";
 
   useEffect(() => {
-    // Only redirect users who signed in with a real email — anonymous
-    // visitors stay on /auth so they can choose to create an account.
-    if (!authLoading && user && user.email) navigate(from, { replace: true });
+    if (!authLoading && user) navigate(from, { replace: true });
   }, [authLoading, user, navigate, from]);
+
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();

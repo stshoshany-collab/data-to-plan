@@ -1,32 +1,27 @@
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode } from "react";
+import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 
 /**
- * AuthGuard now allows instant access:
- * - If a user is signed in (email/password), use that session.
- * - Otherwise, sign the visitor in anonymously so RLS still works
- *   (every row gets owner_id = auth.uid()) without requiring an email.
- *
- * The user can still upgrade to a real account later via /auth.
+ * AuthGuard requires a real authenticated user (email + password).
+ * Anonymous access is disabled at the backend level as well, so every
+ * row stays protected by RLS policies scoped to `authenticated`.
  */
 export function AuthGuard({ children }: { children: ReactNode }) {
   const { user, loading } = useAuth();
-  const [bootstrapping, setBootstrapping] = useState(false);
+  const location = useLocation();
 
-  useEffect(() => {
-    if (loading || user || bootstrapping) return;
-    setBootstrapping(true);
-    supabase.auth.signInAnonymously().finally(() => setBootstrapping(false));
-  }, [loading, user, bootstrapping]);
-
-  if (loading || (!user && bootstrapping) || !user) {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
+  }
+
+  if (!user) {
+    return <Navigate to="/auth" replace state={{ from: location.pathname }} />;
   }
 
   return <>{children}</>;

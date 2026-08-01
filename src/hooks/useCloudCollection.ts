@@ -40,6 +40,20 @@ export function useCloudCollection<T extends BaseEntity>(
   const [items, setItems] = useState<T[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // `cases` is the root table and has no case_id column; it does have `name`.
+  const buildPayload = useCallback(
+    (rest: any, caseId?: string) => {
+      const payload: Record<string, unknown> = { data: rest };
+      if (table === "cases") {
+        if (typeof rest?.name === "string") payload.name = rest.name;
+      } else {
+        payload.case_id = caseId || null;
+      }
+      return payload;
+    },
+    [table],
+  );
+
   const hydrate = useCallback((row: any): T => ({
     ...(row.data || {}),
     id: row.id,
@@ -86,11 +100,7 @@ export function useCloudCollection<T extends BaseEntity>(
       }
       const rows = arr.map((it: any) => {
         const { id, createdAt, updatedAt, caseId, ...rest } = it;
-        return {
-          owner_id: user.id,
-          case_id: caseId || null,
-          data: rest,
-        };
+        return { owner_id: user.id, ...buildPayload(rest, caseId) };
       });
       const { error } = await (supabase as any).from(table).insert(rows);
       if (error) console.warn(`migration of ${table} failed`, error);
@@ -98,7 +108,7 @@ export function useCloudCollection<T extends BaseEntity>(
     } catch (e) {
       console.warn("migrateLegacy", e);
     }
-  }, [user, table, options.legacyKey]);
+  }, [user, table, options.legacyKey, buildPayload]);
 
   useEffect(() => {
     (async () => {
@@ -112,11 +122,7 @@ export function useCloudCollection<T extends BaseEntity>(
     const { id, createdAt, updatedAt, caseId, ...rest } = item as any;
     const { data, error } = await (supabase as any)
       .from(table)
-      .insert({
-        owner_id: user.id,
-        case_id: caseId || null,
-        data: rest,
-      })
+      .insert({ owner_id: user.id, ...buildPayload(rest, caseId) })
       .select()
       .single();
     if (error) {
@@ -129,7 +135,7 @@ export function useCloudCollection<T extends BaseEntity>(
       owner_id: user.id, action: "create", entity: table, entity_id: data.id,
     });
     return hydrated;
-  }, [user, table, hydrate]);
+  }, [user, table, hydrate, buildPayload]);
 
   const update = useCallback(async (id: string, updates: Partial<T>) => {
     if (!user) return;
@@ -140,7 +146,7 @@ export function useCloudCollection<T extends BaseEntity>(
     const { id: _id, createdAt: _c, updatedAt: _u, caseId, ...rest } = merged;
     const { error } = await (supabase as any)
       .from(table)
-      .update({ data: rest, case_id: caseId || null })
+      .update(buildPayload(rest, caseId))
       .eq("id", id);
     if (error) console.error(`update ${table} failed`, error);
     else {
@@ -148,7 +154,7 @@ export function useCloudCollection<T extends BaseEntity>(
         owner_id: user.id, action: "update", entity: table, entity_id: id,
       });
     }
-  }, [user, table, items]);
+  }, [user, table, items, buildPayload]);
 
   const remove = useCallback(async (id: string) => {
     if (!user) return;

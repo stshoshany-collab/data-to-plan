@@ -21,7 +21,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { AuthGuard } from "@/components/AuthGuard";
 import { AppLayout } from "@/components/layout/AppLayout";
-import Index from "./pages/Index";
+import Dashboard from "./pages/Dashboard";
 import Auth from "./pages/Auth";
 import Cases from "./pages/Cases";
 import DataCollection from "./pages/DataCollection";
@@ -53,7 +53,7 @@ const App = () => (
                 <AuthGuard>
                   <AppLayout>
                     <Routes>
-                      <Route path="/" element={<Index />} />
+                      <Route path="/" element={<Dashboard />} />
                       <Route path="/cases" element={<Cases />} />
                       <Route path="/data-collection" element={<DataCollection />} />
                       <Route path="/analysis" element={<Analysis />} />
